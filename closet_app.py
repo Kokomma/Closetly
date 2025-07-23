@@ -3,6 +3,11 @@
 import streamlit as st
 from PIL import Image
 import os
+CLOSET_DIR = "closet_images"
+
+# Create folder if it doesn’t exist
+if not os.path.exists(CLOSET_DIR):
+    os.makedirs(CLOSET_DIR)
 import uuid
 
 # Setup
