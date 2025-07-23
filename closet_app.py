@@ -41,18 +41,24 @@ if uploaded_file:
 # Display closet
 st.header("🧾 My Closet")
 cols = st.columns(4)
-images = [f for f in os.listdir(CLOSET_DIR) if f.endswith((".jpg", ".png", ".jpeg"))]
+images = [f for f in os.listdir(CLOSET_DIR) if f.lower().endswith((".jpg", ".png", ".jpeg"))]
 
 for idx, image_file in enumerate(images):
     path = os.path.join(CLOSET_DIR, image_file)
-    with cols[idx % 4]:
-        st.image(path, width=150)
-        tag_file = path.replace(".png", ".txt").replace(".jpg", ".txt")
-        if os.path.exists(tag_file):
-            tags = open(tag_file).read().split(",")
-            st.caption(f"Type: {tags[0]}\nColor: {tags[1]}\nOccasion: {tags[2]}")
-        else:
-            st.caption("No tags")
+
+    try:
+        with cols[idx % 4]:
+            st.image(path, width=150)
+
+            tag_file = path.replace(".png", ".txt").replace(".jpg", ".txt").replace(".jpeg", ".txt")
+            if os.path.exists(tag_file):
+                tags = open(tag_file).read().split(",")
+                st.caption(f"Type: {tags[0]}\nColor: {tags[1]}\nOccasion: {tags[2]}")
+            else:
+                st.caption("No tags")
+
+    except Exception as e:
+        st.warning(f"⚠️ Could not display {image_file}: {e}")
 
 # Outfit preview
 st.header("🪞 Outfit Preview")
