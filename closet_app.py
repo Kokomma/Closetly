@@ -41,16 +41,28 @@ if uploaded_file:
 # Display closet
 st.header("🧾 My Closet")
 cols = st.columns(4)
-images = [f for f in os.listdir(CLOSET_DIR) if f.lower().endswith((".jpg", ".png", ".jpeg"))]
 
-for idx, image_file in enumerate(images):
-    path = os.path.join(CLOSET_DIR, image_file)
+# Only load actual image files
+image_files = [f for f in os.listdir(CLOSET_DIR) if f.lower().endswith((".jpg", ".jpeg", ".png"))]
+
+# Keep track to avoid duplicates
+displayed = set()
+
+for idx, image_file in enumerate(sorted(image_files)):
+    if image_file in displayed:
+        continue  # skip duplicates
+    displayed.add(image_file)
+
+    image_path = os.path.join(CLOSET_DIR, image_file)
 
     try:
         with cols[idx % 4]:
-            st.image(path, width=150)
+            st.image(image_path, width=150)
 
-            tag_file = path.replace(".png", ".txt").replace(".jpg", ".txt").replace(".jpeg", ".txt")
+            # Get base name without extension
+            base_name = os.path.splitext(image_file)[0]
+            tag_file = os.path.join(CLOSET_DIR, f"{base_name}.txt")
+
             if os.path.exists(tag_file):
                 tags = open(tag_file).read().split(",")
                 st.caption(f"Type: {tags[0]}\nColor: {tags[1]}\nOccasion: {tags[2]}")
