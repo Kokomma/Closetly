@@ -74,8 +74,7 @@ for idx, image_file in enumerate(sorted(image_files)):
 
 # Outfit preview
 st.header("🪞 Outfit Preview")
-selected_images = st.multiselect("Choose items to create an outfit", images)
-
+selected_images = st.multiselect("Choose items to create an outfit", image_files)
 if selected_images:
     for img in selected_images:
         st.image(os.path.join(CLOSET_DIR, img), width=200)
