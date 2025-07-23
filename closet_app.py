@@ -3,18 +3,13 @@
 import streamlit as st
 from PIL import Image
 import os
-CLOSET_DIR = "closet_images"
-
-# Create folder if it doesn’t exist
-if not os.path.exists(CLOSET_DIR):
-    os.makedirs(CLOSET_DIR)
 import uuid
 
 # Setup
 st.set_page_config(page_title="My Closet App", layout="wide")
-st.title("👗🧥 My Digital Closet")
+st.title("👗 My Digital Closet")
 
-# Image folder
+# Create image folder
 CLOSET_DIR = "closet_images"
 if not os.path.exists(CLOSET_DIR):
     os.makedirs(CLOSET_DIR)
@@ -39,7 +34,9 @@ if uploaded_file:
     occasion = st.text_input("Occasion (e.g. casual, work, party)")
 
     if st.button("Save Item"):
-        with open(image_path.replace(".png", ".txt").replace(".jpg", ".txt"), "w") as f:
+        base_name = os.path.splitext(unique_name)[0]
+        tag_path = os.path.join(CLOSET_DIR, f"{base_name}.txt")
+        with open(tag_path, "w") as f:
             f.write(f"{tag_type},{color},{occasion}")
         st.success("✅ Item saved with tags!")
 
@@ -47,15 +44,13 @@ if uploaded_file:
 st.header("🧾 My Closet")
 cols = st.columns(4)
 
-# Only load actual image files
+# Only show valid image files
 image_files = [f for f in os.listdir(CLOSET_DIR) if f.lower().endswith((".jpg", ".jpeg", ".png"))]
-
-# Keep track to avoid duplicates
 displayed = set()
 
 for idx, image_file in enumerate(sorted(image_files)):
     if image_file in displayed:
-        continue  # skip duplicates
+        continue
     displayed.add(image_file)
 
     image_path = os.path.join(CLOSET_DIR, image_file)
@@ -64,12 +59,11 @@ for idx, image_file in enumerate(sorted(image_files)):
         with cols[idx % 4]:
             st.image(image_path, width=150)
 
-            # Get base name without extension
             base_name = os.path.splitext(image_file)[0]
-            tag_file = os.path.join(CLOSET_DIR, f"{base_name}.txt")
+            tag_path = os.path.join(CLOSET_DIR, f"{base_name}.txt")
 
-            if os.path.exists(tag_file):
-                tags = open(tag_file).read().split(",")
+            if os.path.exists(tag_path):
+                tags = open(tag_path).read().split(",")
                 st.caption(f"Type: {tags[0]}\nColor: {tags[1]}\nOccasion: {tags[2]}")
             else:
                 st.caption("No tags")
@@ -80,6 +74,7 @@ for idx, image_file in enumerate(sorted(image_files)):
 # Outfit preview
 st.header("🪞 Outfit Preview")
 selected_images = st.multiselect("Choose items to create an outfit", image_files)
+
 if selected_images:
     for img in selected_images:
         st.image(os.path.join(CLOSET_DIR, img), width=200)
